@@ -4,12 +4,11 @@ import moment from 'moment';
 import {PlannerContext, PlannerConsumer} from './Planner.context';
 
 
-const PlannerTimeline = (props) => (
+
+const PlannerTimeline = () => (
 
 	<PlannerConsumer>
-		{context=> {
-      const weekStart = moment().startOf('day');
-      const weekEnd = moment(weekStart).add(7, 'days');
+		{context => {
       const customTimes = {
         scrubber: moment() 
       };
@@ -20,17 +19,11 @@ const PlannerTimeline = (props) => (
         showMajorLabels: true,
         showCurrentTime: false,
         showTooltips: true,
-        start: weekStart,
-        end: weekEnd,
+        start: context.state.weekStart,
+        end: context.state.weekEnd,
         zoomMin: 1000000,
         type: 'range',
         editable: false,
-        format: {
-          minorLabels: {
-            minute: 'h:mma',
-            hour: 'ha'
-          }
-        }
       }
 			const groups = [
 			  {
@@ -47,10 +40,11 @@ const PlannerTimeline = (props) => (
 			  }
 			];
 
-      const items = context.serviceActions.map((action) => {
-        let start = moment(weekStart).add(action.startDay, 'days');
+      const items = context.state.serviceActions.map((action) => {
+        let start = moment(context.state.weekStart).add(action.startDay, 'days');
         let end = moment(start).add(action.duration, 'hours');
         return  {
+          id: action.id,
           start: start,
           end: end,
           content: 'sa.'+action.name,
@@ -61,8 +55,8 @@ const PlannerTimeline = (props) => (
 
 			return(
 				<div>
-				<h4>Total Engineers: {context.totalEngineers}</h4>
-				<Timeline options={options} items={items} groups={groups} customTimes={customTimes}/>
+				<h4>Total Engineers Needed: {context.state.totalEngineers}</h4>
+				<Timeline options={options} items={items} groups={groups} customTimes={customTimes} selectHandler={context.actions.handleServiceActionClick} />
 				</div>
 			)
 		}}
