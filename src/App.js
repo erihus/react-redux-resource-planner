@@ -11,6 +11,7 @@ import './App.css';
 class App extends Component {
   state = {
     totalEngineers: 0,
+    scrubber: moment(), 
     weekStart: moment().startOf('day'),
     weekEnd: moment(this.weekStart).add(7, 'days'),
     serviceActions: [
@@ -18,7 +19,7 @@ class App extends Component {
         id: 1,
         name: 'A',
         machineId: 1,
-        startDay: 0,
+        start: moment(this.weekStart).add(8,'hours'),
         duration: 12,
         engineers: 2,
         editing: false
@@ -27,7 +28,7 @@ class App extends Component {
         id: 2,
         name: 'B',
         machineId: 2,
-        startDay: 1,
+        start: moment(this.weekStart).add(1, 'd'),
         duration: 24,
         engineers: 3,
         editing: false
@@ -36,7 +37,7 @@ class App extends Component {
         id: 3,
         name: 'C',
         machineId: 1,
-        startDay: 3,
+        start: moment(this.weekStart).add(3, 'd'),
         duration: 48,
         engineers: 5,
         editing: false
@@ -45,7 +46,7 @@ class App extends Component {
         id: 4,
         name: 'D',
         machineId: 2,
-        startDay: 4,
+        start: moment(this.weekStart).add(4, 'd'),
         duration: 12,
         engineers: 4,
         editing: false
@@ -53,9 +54,26 @@ class App extends Component {
     ]
   }
 
-
-
   render() {
+    updateTotalEngineers() {
+      const time = this.state.scrubber;
+      let activeEngineers = 0;
+      this.state.serviceActions.map((sa) => {
+        let saStart = sa.start;
+        let saEnd = moment(sa.start).add(sa.duration, 'hours');
+        if(time.isBetween(saStart, saEnd)) {
+          // console.log('sa '+sa.name+' adding '+sa.engineers);
+          activeEngineers += sa.engineers;
+        }
+        return activeEngineers;
+      });
+      // console.log(activeEngineers);
+      const newState = update(this.state, {
+        totalEngineers: {$set: activeEngineers},
+      });
+      // console.log(newState);
+      this.setState(newState);
+    }
     return (
       <div className="App">
         <PlannerContext.Provider value={
@@ -71,18 +89,51 @@ class App extends Component {
                     ))
                   });
               },
-              handleEngineerChange: (id, value) => {
-                console.log('context engineer event handler');
-                console.log(id);
-                console.log(value);
-
+              handleServiceActionUpdate: (id, field, value) => {
+                if(field === 'engineers') {
+                  value = parseInt(value);
+                }
+                this.setState({
+                    serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
+                      Object.assign({}, sa, { [field]: value }) : sa   
+                    ))
+                }, () => {
+                  const time = this.state.scrubber;
+                  let activeEngineers = 0;
+                  this.state.serviceActions.map((sa) => {
+                    let saStart = sa.start;
+                    let saEnd = moment(sa.start).add(sa.duration, 'hours');
+                    if(moment(time).isBetween(saStart, saEnd)) {
+                      // console.log('sa '+sa.name+' adding '+sa.engineers);
+                      activeEngineers += sa.engineers;
+                    }
+                    return activeEngineers;
+                  });
+                  const newState = update(this.state, {
+                    totalEngineers: {$set: activeEngineers},
+                  });
+                  this.setState(newState);
+                });
               },
-              handleDurationChange: (id, value) => {
-                console.log('context engineer event handler');
-                console.log(id);
-                console.log(value);
+              handleScrubberUpdate: (data) => {
+                const time = data.time;
+                let activeEngineers = 0;
+                this.state.serviceActions.map((sa) => {
+                  let saStart = sa.start;
+                  let saEnd = moment(sa.start).add(sa.duration, 'hours');
+                  if(moment(time).isBetween(saStart, saEnd)) {
+                    // console.log('sa '+sa.name+' adding '+sa.engineers);
+                    activeEngineers += sa.engineers;
+                  }
+                  return activeEngineers;
+                });
+                const newState = update(this.state, {
+                  totalEngineers: {$set: activeEngineers},
+                  scrubber: {$set: moment(time)}
+                });
+                this.setState(newState);              
               }
-            }
+            }            
           }
         }>
           <PlannerTimeline />

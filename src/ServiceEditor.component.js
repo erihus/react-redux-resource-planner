@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import moment from 'moment';
-import {PlannerContext, PlannerConsumer} from './Planner.context';
+import {PlannerConsumer} from './Planner.context';
 
 class ServiceEditor extends Component {
   constructor(props) {
@@ -13,13 +12,10 @@ class ServiceEditor extends Component {
     const target = event.target;
     const val = target.value;
     const name = target.name; 
-    switch (name) {
-      case 'engineers':
-        this.props.actions.handleEngineerChange(this.props.id, val);
-        break;
-    }
     
+    this.props.actions.handleServiceActionUpdate(this.props.id, name, val);      
   }
+
   render() {
     return (
       <form style={{display: (this.props.attributes.editing) ? 'block' : 'none'}}>
@@ -27,7 +23,7 @@ class ServiceEditor extends Component {
         <label>Number of Engineers</label>
         <input type="number" name="engineers" defaultValue={this.props.attributes.engineers} ref={this.input} onChange={this.handleChange} /> 
         <label>Duration (hrs)</label>
-        <input type="number" name="duration" defaultValue={this.props.attributes.duration}  onChange={this.handleDurationChange} />
+        <input type="number" name="duration" defaultValue={this.props.attributes.duration}  onChange={this.handleChange} />
       </form>
     );
   }

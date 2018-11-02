@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Timeline from 'react-visjs-timeline';
 import moment from 'moment';
-import {PlannerContext, PlannerConsumer} from './Planner.context';
+import {PlannerConsumer} from './Planner.context';
 
 
 
@@ -9,9 +9,10 @@ const PlannerTimeline = () => (
 
 	<PlannerConsumer>
 		{context => {
+      // console.log(context.state.scrubber);
       const customTimes = {
-        scrubber: moment() 
-      };
+        scrubber: context.state.scrubber
+      }
       const options = {
         width: '90%',
         // height: '300px',
@@ -40,23 +41,23 @@ const PlannerTimeline = () => (
 			  }
 			];
 
-      const items = context.state.serviceActions.map((action) => {
-        let start = moment(context.state.weekStart).add(action.startDay, 'days');
-        let end = moment(start).add(action.duration, 'hours');
+      const items = context.state.serviceActions.map((sa) => {
+        const start = sa.start;//moment(context.state.weekStart).add(sa.startDay, 'days');
+        const end = moment(start).add(sa.duration, 'hours');
         return  {
-          id: action.id,
+          id: sa.id,
           start: start,
           end: end,
-          content: 'sa.'+action.name,
-          group: action.machineId,
-          title: 'Engineers: '+action.engineers
+          content: 'sa.'+sa.name,
+          group: sa.machineId,
+          title: 'Engineers: '+sa.engineers+', Duration:'+sa.duration+' hours'
         }
       });
-
+ 
 			return(
 				<div>
 				<h4>Total Engineers Needed: {context.state.totalEngineers}</h4>
-				<Timeline options={options} items={items} groups={groups} customTimes={customTimes} selectHandler={context.actions.handleServiceActionClick} />
+				<Timeline options={options} items={items} groups={groups} customTimes={customTimes} selectHandler={context.actions.handleServiceActionClick} timechangeHandler={context.actions.handleScrubberUpdate} />
 				</div>
 			)
 		}}
