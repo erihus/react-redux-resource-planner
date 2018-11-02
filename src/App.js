@@ -54,26 +54,46 @@ class App extends Component {
     ]
   }
 
-  render() {
-    updateTotalEngineers() {
-      const time = this.state.scrubber;
-      let activeEngineers = 0;
-      this.state.serviceActions.map((sa) => {
-        let saStart = sa.start;
-        let saEnd = moment(sa.start).add(sa.duration, 'hours');
-        if(time.isBetween(saStart, saEnd)) {
-          // console.log('sa '+sa.name+' adding '+sa.engineers);
-          activeEngineers += sa.engineers;
-        }
-        return activeEngineers;
-      });
-      // console.log(activeEngineers);
-      const newState = update(this.state, {
-        totalEngineers: {$set: activeEngineers},
-      });
-      // console.log(newState);
-      this.setState(newState);
+  showHideActionEditor(id) {
+    this.setState({
+      serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
+        Object.assign({}, sa, { editing: true }) : 
+        Object.assign({}, sa, { editing: false })
+      ))
+    });
+  }
+
+  updateServiceAction(id, field, value) {
+    if(field === 'engineers') {
+      value = parseInt(value);
     }
+    const newState = {
+      serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
+          Object.assign({}, sa, { [field]: value }) : sa   
+        ))
+    }
+    this.setState(newState, 
+      () => {
+        const time = this.state.scrubber;
+        let activeEngineers = 0;
+        this.state.serviceActions.map((sa) => {
+          let saStart = sa.start;
+          let saEnd = moment(sa.start).add(sa.duration, 'hours');
+          if(moment(time).isBetween(saStart, saEnd)) {
+            // console.log('sa '+sa.name+' adding '+sa.engineers);
+            activeEngineers += sa.engineers;
+          }
+          return activeEngineers;
+        });
+        const newState = update(this.state, {
+          totalEngineers: {$set: activeEngineers},
+        });
+        this.setState(newState);
+      }
+    );
+  }
+
+  render() {
     return (
       <div className="App">
         <PlannerContext.Provider value={
@@ -81,39 +101,11 @@ class App extends Component {
             state: this.state,
             actions: {
               handleServiceActionClick: event => {
-                  let id = event.items[0];
-                  this.setState({
-                    serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
-                      Object.assign({}, sa, { editing: true }) : 
-                      Object.assign({}, sa, { editing: false })
-                    ))
-                  });
+                let id = event.items[0];
+                this.showHideActionEditor(id);
               },
               handleServiceActionUpdate: (id, field, value) => {
-                if(field === 'engineers') {
-                  value = parseInt(value);
-                }
-                this.setState({
-                    serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
-                      Object.assign({}, sa, { [field]: value }) : sa   
-                    ))
-                }, () => {
-                  const time = this.state.scrubber;
-                  let activeEngineers = 0;
-                  this.state.serviceActions.map((sa) => {
-                    let saStart = sa.start;
-                    let saEnd = moment(sa.start).add(sa.duration, 'hours');
-                    if(moment(time).isBetween(saStart, saEnd)) {
-                      // console.log('sa '+sa.name+' adding '+sa.engineers);
-                      activeEngineers += sa.engineers;
-                    }
-                    return activeEngineers;
-                  });
-                  const newState = update(this.state, {
-                    totalEngineers: {$set: activeEngineers},
-                  });
-                  this.setState(newState);
-                });
+                this.updateServiceAction(id,field,value);
               },
               handleScrubberUpdate: (data) => {
                 const time = data.time;
