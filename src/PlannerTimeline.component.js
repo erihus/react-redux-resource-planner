@@ -1,6 +1,6 @@
 import React from 'react';
-import Timeline from 'react-visjs-timeline';
 import moment from 'moment';
+import Timeline from 'react-visjs-timeline';
 import {PlannerConsumer} from './Planner.context';
 
 
@@ -24,7 +24,8 @@ const PlannerTimeline = () => (
         end: context.state.weekEnd,
         zoomMin: 1000000,
         type: 'range',
-        editable: false,
+        editable: true,
+        selectable: true
       }
 			const groups = [
 			  {

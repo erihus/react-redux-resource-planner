@@ -114,7 +114,6 @@ class App extends Component {
                   let saStart = sa.start;
                   let saEnd = moment(sa.start).add(sa.duration, 'hours');
                   if(moment(time).isBetween(saStart, saEnd)) {
-                    // console.log('sa '+sa.name+' adding '+sa.engineers);
                     activeEngineers += sa.engineers;
                   }
                   return activeEngineers;
