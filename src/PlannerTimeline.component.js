@@ -18,14 +18,14 @@ const PlannerTimeline = () => (
         // height: '300px',
         stack: true,
         showMajorLabels: true,
-        showCurrentTime: false,
+        showCurrentTime: true,
         showTooltips: true,
         start: context.state.weekStart,
         end: context.state.weekEnd,
         zoomMin: 1000000,
         type: 'range',
-        editable: true,
-        selectable: true
+        zoomable: false,
+        moveable: false
       }
 			const groups = [
 			  {
@@ -49,14 +49,14 @@ const PlannerTimeline = () => (
           id: sa.id,
           start: start,
           end: end,
-          content: 'sa.'+sa.name,
+          content: sa.name,
           group: sa.machineId,
           title: 'Engineers: '+sa.engineers+', Duration:'+sa.duration+' hours'
         }
       });
  
 			return(
-				<div>
+				<div id="timeline">
 				<h4>Total Engineers Needed: {context.state.totalEngineers}</h4>
 				<Timeline options={options} items={items} groups={groups} customTimes={customTimes} selectHandler={context.actions.handleServiceActionClick} timechangeHandler={context.actions.handleScrubberUpdate} />
 				</div>

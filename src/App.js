@@ -19,7 +19,7 @@ class App extends Component {
         id: 1,
         name: 'A',
         machineId: 1,
-        start: moment(this.weekStart).add(8,'hours'),
+        start: moment().startOf('day'),
         duration: 12,
         engineers: 2,
         editing: false
@@ -28,7 +28,7 @@ class App extends Component {
         id: 2,
         name: 'B',
         machineId: 2,
-        start: moment(this.weekStart).add(1, 'd'),
+        start: moment().startOf('day').add(1,'d'),
         duration: 24,
         engineers: 3,
         editing: false
@@ -37,7 +37,7 @@ class App extends Component {
         id: 3,
         name: 'C',
         machineId: 1,
-        start: moment(this.weekStart).add(3, 'd'),
+        start: moment().startOf('day').add(3,'d'),
         duration: 48,
         engineers: 5,
         editing: false
@@ -46,7 +46,7 @@ class App extends Component {
         id: 4,
         name: 'D',
         machineId: 2,
-        start: moment(this.weekStart).add(4, 'd'),
+        start: moment().startOf('day').add(4,'d'),
         duration: 12,
         engineers: 4,
         editing: false
@@ -54,13 +54,22 @@ class App extends Component {
     ]
   }
 
-  showHideActionEditor(id) {
+  showActionEditor(id) {
     this.setState({
       serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
         Object.assign({}, sa, { editing: true }) : 
         Object.assign({}, sa, { editing: false })
       ))
     });
+  }
+
+  hideActionEditor(id) {
+    const newState = {
+      serviceActions: this.state.serviceActions.map(sa => (
+        Object.assign({}, sa, { editing: false }) : sa        
+      ))
+    };
+    this.setState(newState);
   }
 
   updateServiceAction(id, field, value) {
@@ -102,7 +111,10 @@ class App extends Component {
             actions: {
               handleServiceActionClick: event => {
                 let id = event.items[0];
-                this.showHideActionEditor(id);
+                this.showActionEditor(id);
+              },
+              handleServiceActionClose: (id) => {
+                this.hideActionEditor(id);
               },
               handleServiceActionUpdate: (id, field, value) => {
                 this.updateServiceAction(id,field,value);
