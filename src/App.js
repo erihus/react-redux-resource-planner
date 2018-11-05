@@ -12,7 +12,7 @@ class App extends Component {
     super(props);
     let defaultData = {
       totalEngineers: 0,
-      scrubber: moment().subtract(2, 'h'), 
+      scrubber: moment(), 
       weekStart: moment().startOf('day'),
       weekEnd: moment(this.weekStart).add(7, 'days'),
       serviceActions: [
