@@ -10,9 +10,10 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    let defaultData = {
+    const defaultData = {
       totalEngineers: 0,
-      scrubber: moment().subtract(2, 'h'), 
+      scrubber: moment(), 
+      scrubberInterval: null,
       weekStart: moment().startOf('day'),
       weekEnd: moment(this.weekStart).add(7, 'days'),
       serviceActions: [
@@ -60,6 +61,31 @@ class App extends Component {
       totalEngineers: calcEngineers
     };
   }  
+
+  componentDidMount() {
+    let timer = setInterval(() => {this.advanceScrubber()}, 6000);
+    this.setState({scrubberInterval: timer})
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.interval);
+  }
+
+  advanceScrubber() {
+    let newTime = this.state.scrubber.add(6, 'h');
+    if(!newTime.isAfter(this.state.weekEnd)) {
+      let newState = {
+        ...this.state,
+          scrubber: newTime
+      };
+      const calcEngineers = this.calculateEngineers(newState)
+      newState = {
+        ...newState,
+        totalEngineers: calcEngineers
+      }
+      this.setState(newState);
+    }
+  }
 
   showActionEditor(id) {
     this.setState({
