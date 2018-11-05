@@ -1,9 +1,9 @@
-##Project Brief
+## Project Brief
 
 A sample project to demonstrate ability with React and React Context to create an interactive planning and scheduling UI. Planner shows 4 "service actions" associated with 3 machines on a timeline of 7 days. User can update start time, duration and number of resources allocated to each service action. Start time and duraction can be updated by drag and drop on the timeline, or double clicking the timeline item to open a popup editor. Total resources for a given time is dynamically calculated and updated across components using React Context. A "scrubber" (blue bar) can be dragged across the timeline to view number of required resources at a given time. 
 
 
-##About Create React App
+## About Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
