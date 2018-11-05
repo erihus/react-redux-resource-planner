@@ -9,6 +9,7 @@ import './App.css';
 
 
 class App extends Component {
+
   state = {
     totalEngineers: 0,
     scrubber: moment(), 
@@ -63,6 +64,10 @@ class App extends Component {
     });
   }
 
+  calculateEngineers(state) {
+
+  }
+
   hideActionEditor(id) {
     const newState = {
       serviceActions: this.state.serviceActions.map(sa => (
@@ -85,7 +90,7 @@ class App extends Component {
       () => {
         const time = this.state.scrubber;
         let activeEngineers = 0;
-        this.state.serviceActions.map((sa) => {
+        this.state.serviceActions.map(sa => {
           let saStart = sa.start;
           let saEnd = moment(sa.start).add(sa.duration, 'hours');
           if(moment(time).isBetween(saStart, saEnd)) {
@@ -102,6 +107,20 @@ class App extends Component {
     );
   }
 
+  updateServiceActionTime(timelineItem) {
+    const newStart = moment(timelineItem.start)
+    const newEnd = moment(timelineItem.end);
+    const newDuration = newEnd.diff(newStart, 'hours');
+
+    const newState = {
+      serviceActions: this.state.serviceActions.map(sa => (sa.id === timelineItem.id ? 
+        Object.assign({}, sa, { start: newStart, duration: newDuration }) : sa   
+      ))
+    }
+
+    this.setState(newState);
+  }
+
   render() {
     return (
       <div className="App">
@@ -110,16 +129,19 @@ class App extends Component {
             state: this.state,
             actions: {
               handleServiceActionClick: event => {
-                let id = event.items[0];
+                let id = event.item;
                 this.showActionEditor(id);
               },
-              handleServiceActionClose: (id) => {
+              handleServiceActionClose: id => {
                 this.hideActionEditor(id);
               },
               handleServiceActionUpdate: (id, field, value) => {
                 this.updateServiceAction(id,field,value);
               },
-              handleScrubberUpdate: (data) => {
+              handleServiceActionTimeChange: item => {
+                this.updateServiceActionTime(item);
+              },
+              handleScrubberUpdate: data => {
                 const time = data.time;
                 let activeEngineers = 0;
                 this.state.serviceActions.map((sa) => {

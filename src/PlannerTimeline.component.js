@@ -4,20 +4,32 @@ import Timeline from 'react-visjs-timeline';
 import {PlannerConsumer} from './Planner.context';
 
 
-
 const PlannerTimeline = () => (
 
 	<PlannerConsumer>
 		{context => {
-      // console.log(context.state.scrubber);
       const customTimes = {
         scrubber: context.state.scrubber
       }
+
+      const items = context.state.serviceActions.map((sa, context) => {
+        const start = sa.start;
+        const end = moment(start).add(sa.duration, 'hours');
+        return  {
+          id: sa.id,
+          start: start,
+          end: end,
+          content: sa.name,
+          group: sa.machineId,
+          title: 'Engineers: '+sa.engineers+', Duration:'+sa.duration+' hours (double click to edit)',
+        }
+      });
+
       const options = {
         width: '90%',
-        // height: '300px',
         stack: true,
         showMajorLabels: true,
+        showMinorLabels: true,
         showCurrentTime: true,
         showTooltips: true,
         start: context.state.weekStart,
@@ -25,7 +37,15 @@ const PlannerTimeline = () => (
         zoomMin: 1000000,
         type: 'range',
         zoomable: false,
-        moveable: false
+        moveable: false,
+        editable: {
+          updateTime: true,
+          overrideItems: true
+        },
+        snap: null,
+        onMove: function(item) {
+          context.actions.handleServiceActionTimeChange(item);
+        }
       }
 			const groups = [
 			  {
@@ -41,24 +61,18 @@ const PlannerTimeline = () => (
 			    content: 'Machine 3'
 			  }
 			];
-
-      const items = context.state.serviceActions.map((sa) => {
-        const start = sa.start;//moment(context.state.weekStart).add(sa.startDay, 'days');
-        const end = moment(start).add(sa.duration, 'hours');
-        return  {
-          id: sa.id,
-          start: start,
-          end: end,
-          content: sa.name,
-          group: sa.machineId,
-          title: 'Engineers: '+sa.engineers+', Duration:'+sa.duration+' hours'
-        }
-      });
  
 			return(
 				<div id="timeline">
-				<h4>Total Engineers Needed: {context.state.totalEngineers}</h4>
-				<Timeline options={options} items={items} groups={groups} customTimes={customTimes} selectHandler={context.actions.handleServiceActionClick} timechangeHandler={context.actions.handleScrubberUpdate} />
+				<Timeline
+          items={items}  
+          groups={groups}
+          options={options} 
+          customTimes={customTimes} 
+          doubleClickHandler={context.actions.handleServiceActionClick} 
+          timechangeHandler={context.actions.handleScrubberUpdate}
+        />
+        <p id="eng-total"><strong>{context.state.totalEngineers}</strong> Total Engineers Needed For {context.state.scrubber.format('MMMM Do YYYY h:mm a')}</p>
 				</div>
 			)
 		}}
