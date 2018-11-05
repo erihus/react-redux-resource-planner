@@ -1,59 +1,65 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import update from 'immutability-helper';
 import {PlannerContext} from './Planner.context';
 import PlannerTimeline from './PlannerTimeline.component';
 import ServiceEditors from './ServiceEditor.component';
 import './App.css';
 
 
-
 class App extends Component {
 
-  state = {
-    totalEngineers: 0,
-    scrubber: moment(), 
-    weekStart: moment().startOf('day'),
-    weekEnd: moment(this.weekStart).add(7, 'days'),
-    serviceActions: [
-      {
-        id: 1,
-        name: 'A',
-        machineId: 1,
-        start: moment().startOf('day'),
-        duration: 12,
-        engineers: 2,
-        editing: false
-      },
-      {
-        id: 2,
-        name: 'B',
-        machineId: 2,
-        start: moment().startOf('day').add(1,'d'),
-        duration: 24,
-        engineers: 3,
-        editing: false
-      },
-      {
-        id: 3,
-        name: 'C',
-        machineId: 1,
-        start: moment().startOf('day').add(3,'d'),
-        duration: 48,
-        engineers: 5,
-        editing: false
-      },
-      {
-        id: 4,
-        name: 'D',
-        machineId: 2,
-        start: moment().startOf('day').add(4,'d'),
-        duration: 12,
-        engineers: 4,
-        editing: false
-      }
-    ]
-  }
+  constructor(props) {
+    super(props);
+    let defaultData = {
+      totalEngineers: 0,
+      scrubber: moment().subtract(2, 'h'), 
+      weekStart: moment().startOf('day'),
+      weekEnd: moment(this.weekStart).add(7, 'days'),
+      serviceActions: [
+        {
+          id: 1,
+          name: 'A',
+          machineId: 1,
+          start: moment().startOf('day'),
+          duration: 12,
+          engineers: 2,
+          editing: false
+        },
+        {
+          id: 2,
+          name: 'B',
+          machineId: 2,
+          start: moment().startOf('day').add(1,'d'),
+          duration: 24,
+          engineers: 3,
+          editing: false
+        },
+        {
+          id: 3,
+          name: 'C',
+          machineId: 1,
+          start: moment().startOf('day').add(3,'d'),
+          duration: 48,
+          engineers: 5,
+          editing: false
+        },
+        {
+          id: 4,
+          name: 'D',
+          machineId: 2,
+          start: moment().startOf('day').add(4,'d'),
+          duration: 12,
+          engineers: 4,
+          editing: false
+        }
+      ]
+    }
+    const calcEngineers = this.calculateEngineers(defaultData);
+    this.state = {
+      ...defaultData,
+      totalEngineers: calcEngineers
+    };
+  }  
 
   showActionEditor(id) {
     this.setState({
@@ -64,8 +70,19 @@ class App extends Component {
     });
   }
 
-  calculateEngineers(state) {
-
+  calculateEngineers(state) { //not using this.state because it may not have been updated yet, instead passing in temporary new state object
+    const time = state.scrubber;
+    let activeEngineers = 0;
+    state.serviceActions.map(sa => {
+      let saStart = sa.start;
+      let saEnd = moment(sa.start).add(sa.duration, 'hours');
+      if(moment(time).isBetween(saStart, saEnd)) {
+        activeEngineers += sa.engineers;
+      }
+      return activeEngineers;
+    });
+        
+    return activeEngineers;
   }
 
   hideActionEditor(id) {
@@ -81,30 +98,18 @@ class App extends Component {
     if(field === 'engineers') {
       value = parseInt(value);
     }
-    const newState = {
+    let newState = {
+      ...this.state,
       serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
           Object.assign({}, sa, { [field]: value }) : sa   
         ))
     }
-    this.setState(newState, 
-      () => {
-        const time = this.state.scrubber;
-        let activeEngineers = 0;
-        this.state.serviceActions.map(sa => {
-          let saStart = sa.start;
-          let saEnd = moment(sa.start).add(sa.duration, 'hours');
-          if(moment(time).isBetween(saStart, saEnd)) {
-            // console.log('sa '+sa.name+' adding '+sa.engineers);
-            activeEngineers += sa.engineers;
-          }
-          return activeEngineers;
-        });
-        const newState = update(this.state, {
-          totalEngineers: {$set: activeEngineers},
-        });
-        this.setState(newState);
-      }
-    );
+    const calcEngineers = this.calculateEngineers(newState);
+    newState = {
+      ...newState,
+      totalEngineers: calcEngineers
+    }
+    this.setState(newState);
   }
 
   updateServiceActionTime(timelineItem) {
@@ -112,11 +117,18 @@ class App extends Component {
     const newEnd = moment(timelineItem.end);
     const newDuration = newEnd.diff(newStart, 'hours');
 
-    const newState = {
+    let newState = {
+      ...this.state,
       serviceActions: this.state.serviceActions.map(sa => (sa.id === timelineItem.id ? 
         Object.assign({}, sa, { start: newStart, duration: newDuration }) : sa   
       ))
     }
+
+    const calcEngineers = this.calculateEngineers(newState);
+    newState = {
+      ...newState,
+      totalEngineers: calcEngineers
+    } 
 
     this.setState(newState);
   }
@@ -142,20 +154,15 @@ class App extends Component {
                 this.updateServiceActionTime(item);
               },
               handleScrubberUpdate: data => {
-                const time = data.time;
-                let activeEngineers = 0;
-                this.state.serviceActions.map((sa) => {
-                  let saStart = sa.start;
-                  let saEnd = moment(sa.start).add(sa.duration, 'hours');
-                  if(moment(time).isBetween(saStart, saEnd)) {
-                    activeEngineers += sa.engineers;
-                  }
-                  return activeEngineers;
-                });
-                const newState = update(this.state, {
-                  totalEngineers: {$set: activeEngineers},
-                  scrubber: {$set: moment(time)}
-                });
+                let newState = {
+                  ...this.state,
+                  scrubber: moment(data.time)
+                }
+                const calcEngineers = this.calculateEngineers(newState);
+                newState = {
+                  ...newState,
+                  totalEngineers: calcEngineers
+                }
                 this.setState(newState);              
               }
             }            
@@ -164,7 +171,6 @@ class App extends Component {
           <PlannerTimeline />
           <ServiceEditors />
         </PlannerContext.Provider>
-        
       </div>
     );
   }

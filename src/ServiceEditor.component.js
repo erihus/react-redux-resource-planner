@@ -49,7 +49,7 @@ class ServiceEditor extends Component {
             maxDate={moment().add(7, 'd')} 
           />
           <label>Duration (hrs)</label>
-          <input type="number" name="duration" defaultValue={this.props.attributes.duration}  onChange={this.handleChange} />
+          <input type="number" name="duration" value={parseInt(this.props.attributes.duration)}  onChange={this.handleChange} />
         </form>
       </div>
     );

@@ -8,6 +8,7 @@ const PlannerTimeline = () => (
 
 	<PlannerConsumer>
 		{context => {
+      console.log(context);
       const customTimes = {
         scrubber: context.state.scrubber
       }
