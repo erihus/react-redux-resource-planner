@@ -73,18 +73,17 @@ class App extends Component {
 
   advanceScrubber() {
     let newTime = this.state.scrubber.add(6, 'h');
-    if(!newTime.isAfter(this.state.weekEnd)) {
-      let newState = {
-        ...this.state,
-          scrubber: newTime
-      };
-      const calcEngineers = this.calculateEngineers(newState)
-      newState = {
-        ...newState,
-        totalEngineers: calcEngineers
-      }
-      this.setState(newState);
+    newTime = (newTime.isAfter(this.state.weekEnd)) ? moment() : newTime
+    let newState = {
+      ...this.state,
+        scrubber: newTime
+    };
+    const calcEngineers = this.calculateEngineers(newState)
+    newState = {
+      ...newState,
+      totalEngineers: calcEngineers
     }
+    this.setState(newState);
   }
 
   showActionEditor(id) {
