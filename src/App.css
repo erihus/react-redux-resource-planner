@@ -12,6 +12,26 @@
   position: relative;
   right: 5%;
   top: -55px;
+  color: #4d4d4d;
+}
+
+#toggles {
+  float: left;
+  position: relative;
+  left: 5%;
+  top: -40px;
+}
+
+#toggles label {
+  float: left;
+  clear: both;
+  margin-bottom: 10px;
+  color: #4d4d4d;
+  font-size: .8em;
+}
+
+#toggles input[type="checkbox"] {
+  float: left;
 }
 
 .sa-editor {

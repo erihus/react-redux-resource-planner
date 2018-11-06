@@ -36,8 +36,8 @@ const PlannerTimeline = () => (
         end: context.state.weekEnd,
         zoomMin: 1000000,
         type: 'range',
-        // zoomable: true,
-        // moveable: true,
+        zoomable: (context.state.enableTimelineZoom) ? true : false,
+        moveable: (context.state.enableTimelineZoom) ? true : false,
         editable: {
           updateTime: true,
           overrideItems: true
@@ -72,6 +72,10 @@ const PlannerTimeline = () => (
           doubleClickHandler={context.actions.handleServiceActionClick} 
           timechangeHandler={context.actions.handleScrubberUpdate}
         />
+        <div id="toggles">
+          <label>Enable Timeline Zooming <input type="checkbox" name="zoom-toggle" onChange={context.actions.toggleTimelineZoom}/></label>
+          <label>Enable Auto-Advancing Scrubber <input type="checkbox" name="scrubber-toggle" onChange={context.actions.toggleAutoScrub}/></label>
+        </div>
         <p id="eng-total"><strong>{context.state.totalEngineers}</strong> Total Engineers Needed For {context.state.scrubber.format('MMMM Do YYYY h:mm a')}</p>
 				</div>
 			)

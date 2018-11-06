@@ -13,6 +13,8 @@ class App extends Component {
     const defaultData = {
       totalEngineers: 0,
       scrubber: moment().startOf('day'), 
+      autoAdvanceScrubber: false,
+      enableTimelineZoom: false,
       scrubberInterval: null,
       weekStart: moment().startOf('day'),
       weekEnd: moment(this.weekStart).add(7, 'days'),
@@ -67,9 +69,27 @@ class App extends Component {
   //   this.setState({scrubberInterval: timer})
   // }
 
-  // componentWillUnmount() {
-  //   clearInterval(this.state.interval);
-  // }
+  componentWillUnmount() {
+    clearInterval(this.state.interval);
+  }
+
+  toggleAutoScrubber(checked) {
+    if(checked) {
+      let timer = setInterval(() => {this.advanceScrubber()}, 6000);
+      const newState = {
+        ...this.state,
+        autoAdvanceScrubber: true,
+        scrubberInterval: timer
+      }
+      this.setState(newState);
+    } else {
+      clearInterval(this.state.scrubberInterval);
+      this.setState({
+        autoAdvanceScrubber: false,
+        scrubberInterval: null
+      });
+    }
+  }
 
   advanceScrubber() {
     let newTime = this.state.scrubber.add(6, 'h');
@@ -189,7 +209,15 @@ class App extends Component {
                   totalEngineers: calcEngineers
                 }
                 this.setState(newState);              
+              },
+              toggleTimelineZoom: () => {
+                this.setState({enableTimelineZoom:(this.state.enableTimelineZoom) ? false : true });
+              },
+              toggleAutoScrub: event => {
+                const checked = event.target.checked;
+                this.toggleAutoScrubber(checked);
               }
+
             }            
           }
         }>
