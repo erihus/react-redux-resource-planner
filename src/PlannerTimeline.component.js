@@ -30,14 +30,14 @@ const PlannerTimeline = () => (
         stack: true,
         showMajorLabels: true,
         showMinorLabels: true,
-        showCurrentTime: true,
+        showCurrentTime: false,
         showTooltips: true,
         start: context.state.weekStart,
         end: context.state.weekEnd,
         zoomMin: 1000000,
         type: 'range',
-        zoomable: false,
-        moveable: false,
+        zoomable: true,
+        moveable: true,
         editable: {
           updateTime: true,
           overrideItems: true

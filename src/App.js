@@ -12,7 +12,7 @@ class App extends Component {
     super(props);
     const defaultData = {
       totalEngineers: 0,
-      scrubber: moment(), 
+      scrubber: moment().startOf('day'), 
       scrubberInterval: null,
       weekStart: moment().startOf('day'),
       weekEnd: moment(this.weekStart).add(7, 'days'),
@@ -62,14 +62,14 @@ class App extends Component {
     };
   }  
 
-  componentDidMount() {
-    let timer = setInterval(() => {this.advanceScrubber()}, 6000);
-    this.setState({scrubberInterval: timer})
-  }
+  // componentDidMount() {
+  //   let timer = setInterval(() => {this.advanceScrubber()}, 6000);
+  //   this.setState({scrubberInterval: timer})
+  // }
 
-  componentWillUnmount() {
-    clearInterval(this.state.interval);
-  }
+  // componentWillUnmount() {
+  //   clearInterval(this.state.interval);
+  // }
 
   advanceScrubber() {
     let newTime = this.state.scrubber.add(6, 'h');
@@ -101,7 +101,7 @@ class App extends Component {
     state.serviceActions.map(sa => {
       let saStart = sa.start;
       let saEnd = moment(sa.start).add(sa.duration, 'hours');
-      if(moment(time).isBetween(saStart, saEnd)) {
+      if(moment(time).isBetween(saStart, saEnd) || moment(time).isSame(saStart)) {
         activeEngineers += sa.engineers;
       }
       return activeEngineers;
