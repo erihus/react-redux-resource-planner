@@ -64,11 +64,6 @@ class App extends Component {
     };
   }  
 
-  // componentDidMount() {
-  //   let timer = setInterval(() => {this.advanceScrubber()}, 6000);
-  //   this.setState({scrubberInterval: timer})
-  // }
-
   componentWillUnmount() {
     clearInterval(this.state.interval);
   }
@@ -174,7 +169,6 @@ class App extends Component {
       ...newState,
       totalEngineers: calcEngineers
     } 
-
     this.setState(newState);
   }
 

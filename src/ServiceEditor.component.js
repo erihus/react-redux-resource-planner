@@ -59,7 +59,6 @@ class ServiceEditor extends Component {
 
 const ServiceEditors = (props) => (
  	<PlannerConsumer>
- 		
     {context => {
       const editors = context.state.serviceActions.map((sa, index) => <ServiceEditor id={sa.id} attributes={sa} key={index} actions={context.actions} /> );
  		  return (
