@@ -36,8 +36,8 @@ const PlannerTimeline = () => (
         end: context.state.weekEnd,
         zoomMin: 1000000,
         type: 'range',
-        zoomable: true,
-        moveable: true,
+        // zoomable: true,
+        // moveable: true,
         editable: {
           updateTime: true,
           overrideItems: true
