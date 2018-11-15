@@ -1,62 +1,82 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import {PlannerContext} from './Planner.context';
-import PlannerTimeline from './PlannerTimeline.component';
+// import {PlannerContext} from './Planner.context';
+// import PlannerTimeline from './PlannerTimeline.component';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
 import ServiceEditors from './ServiceEditor.component';
 import './App.css';
 
+
+const initialState = {
+  totalEngineers: 0,
+  scrubber: moment().startOf('day'), 
+  autoAdvanceScrubber: false,
+  enableTimelineZoom: false,
+  scrubberInterval: null,
+  weekStart: moment().startOf('day'),
+  weekEnd: moment(this.weekStart).add(7, 'days'),
+  serviceActions: [
+    {
+      id: 1,
+      name: 'A',
+      machineId: 1,
+      start: moment().startOf('day'),
+      duration: 12,
+      engineers: 2,
+      editing: false
+    },
+    {
+      id: 2,
+      name: 'B',
+      machineId: 2,
+      start: moment().startOf('day').add(1,'d'),
+      duration: 24,
+      engineers: 3,
+      editing: false
+    },
+    {
+      id: 3,
+      name: 'C',
+      machineId: 1,
+      start: moment().startOf('day').add(3,'d'),
+      duration: 48,
+      engineers: 5,
+      editing: false
+    },
+    {
+      id: 4,
+      name: 'D',
+      machineId: 2,
+      start: moment().startOf('day').add(4,'d'),
+      duration: 12,
+      engineers: 4,
+      editing: false
+    }
+  ] 
+}
+
+const reducer = (state = timerInitialState, action) => {
+  switch (action.type) {
+    case 'SHOW_ACTION_EDITOR':
+        state.serviceActions.map(sa => (sa.id === action.id ? 
+          Object.assign({}, sa, { editing: true }) : 
+          Object.assign({}, sa, { editing: false })
+        ))
+      });
+      break;
+
+    case 'UPDATE_SERVICE_ACTION':
+      break;
+    case ''
+  }
+}
 
 class App extends Component {
 
   constructor(props) {
     super(props);
-    const defaultData = {
-      totalEngineers: 0,
-      scrubber: moment().startOf('day'), 
-      autoAdvanceScrubber: false,
-      enableTimelineZoom: false,
-      scrubberInterval: null,
-      weekStart: moment().startOf('day'),
-      weekEnd: moment(this.weekStart).add(7, 'days'),
-      serviceActions: [
-        {
-          id: 1,
-          name: 'A',
-          machineId: 1,
-          start: moment().startOf('day'),
-          duration: 12,
-          engineers: 2,
-          editing: false
-        },
-        {
-          id: 2,
-          name: 'B',
-          machineId: 2,
-          start: moment().startOf('day').add(1,'d'),
-          duration: 24,
-          engineers: 3,
-          editing: false
-        },
-        {
-          id: 3,
-          name: 'C',
-          machineId: 1,
-          start: moment().startOf('day').add(3,'d'),
-          duration: 48,
-          engineers: 5,
-          editing: false
-        },
-        {
-          id: 4,
-          name: 'D',
-          machineId: 2,
-          start: moment().startOf('day').add(4,'d'),
-          duration: 12,
-          engineers: 4,
-          editing: false
-        }
-      ]
-    }
+   
     const calcEngineers = this.calculateEngineers(defaultData);
     this.state = {
       ...defaultData,
