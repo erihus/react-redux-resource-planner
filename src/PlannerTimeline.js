@@ -1,19 +1,17 @@
 import React from 'react';
 import moment from 'moment';
 import Timeline from 'react-visjs-timeline';
+// import ErrorBoundary from 'ErrorBoundary';
 import { connect } from 'react-redux';
 
 
 class PlannerTimeline extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.handleServiceActionClick = this.handleServiceActionClick.bind(this);
 
-
-	render() {
-    const customTimes = {
-      scrubber: this.props.scrubber
-    }
-
-    const items = this.props.serviceActions.map((sa, context) => {
+    this.items = this.props.serviceActions.map((sa, context) => {
       const start = sa.start;
       const end = moment(start).add(sa.duration, 'hours');
       return  {
@@ -26,7 +24,26 @@ class PlannerTimeline extends React.Component {
       }
     });
 
-    const options = {
+    this.groups = [
+      {
+        id: 1,
+        content: 'Machine 1',
+      },
+      {
+        id: 2,
+        content: 'Machine 2'
+      },
+      {
+        id: 3,
+        content: 'Machine 3'
+      }
+    ];
+
+    this.customTimes = {
+      scrubber: this.props.scrubber
+    }
+
+    this.options = {
       width: '90%',
       stack: true,
       showMajorLabels: true,
@@ -45,38 +62,34 @@ class PlannerTimeline extends React.Component {
       },
       snap: null,
       onMove: function(item) {
-        context.actions.handleServiceActionTimeChange(item);
+        // props.actions.handleServiceActionTimeChange(item);
       }
     }
-    const groups = [
-      {
-        id: 1,
-        content: 'Machine 1',
-      },
-      {
-        id: 2,
-        content: 'Machine 2'
-      },
-      {
-        id: 3,
-        content: 'Machine 3'
-      }
-    ];
+
+  }
+
+
+  handleServiceActionClick(event) {
+    let id = event.item;
+    this.props.dispatch({type:'SHOW_ACTION_EDITOR', 'id': id});
+  }
+
+	render() {
+
 		return(
 			<div id="timeline">
 				<Timeline
-          items={items}  
-          groups={groups}
-          options={options} 
-          customTimes={customTimes} 
-          doubleClickHandler={this.props.handleServiceActionClick} 
+          items={this.items}  
+          groups={this.groups}
+          options={this.options} 
+          customTimes={this.customTimes} 
+          doubleClickHandler={this.handleServiceActionClick} 
           timechangeHandler={this.props.handleScrubberUpdate}
         />
-        <div id="toggles">
+        {/*<div id="toggles">
           <label>Enable Timeline Zooming <input type="checkbox" name="zoom-toggle" onChange={this.props.toggleTimelineZoom}/></label>
           <label>Enable Auto-Advancing Scrubber <input type="checkbox" name="scrubber-toggle" onChange={this.props.toggleAutoScrub}/></label>
-        </div>
-        <p id="eng-total"><strong>{this.props.totalEngineers}</strong> Total Engineers Needed For {this.props.scrubber.format('MMMM Do YYYY h:mm a')}</p>
+        </div>*/}
 			</div>
 			)
 	} 
@@ -88,5 +101,5 @@ function mapStateToProps(state) {
   };
 }
 
-export { PlannerTimeline };
+// export { PlannerTimeline };
 export default connect(mapStateToProps)(PlannerTimeline);

@@ -1,21 +1,21 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-// import {PlannerContext} from './Planner.context';
-// import PlannerTimeline from './PlannerTimeline.component';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
-import ServiceEditors from './ServiceEditor.component';
+import PlannerTimeline from './PlannerTimeline';
+import TotalEngineers from './TotalEngineers';
+import ServiceEditors from './ServiceEditors';
 import './App.css';
 
 
-const initialState = {
+const defaultData = {
   totalEngineers: 0,
   scrubber: moment().startOf('day'), 
   autoAdvanceScrubber: false,
   enableTimelineZoom: false,
   scrubberInterval: null,
   weekStart: moment().startOf('day'),
-  weekEnd: moment(this.weekStart).add(7, 'days'),
+  weekEnd: moment().startOf('day').add(7, 'days'),
   serviceActions: [
     {
       id: 1,
@@ -56,21 +56,54 @@ const initialState = {
   ] 
 }
 
-const reducer = (state = timerInitialState, action) => {
+
+const reducer = (state = defaultData, action) => {
+  // console.log(action);
   switch (action.type) {
     case 'SHOW_ACTION_EDITOR':
-        state.serviceActions.map(sa => (sa.id === action.id ? 
-          Object.assign({}, sa, { editing: true }) : 
-          Object.assign({}, sa, { editing: false })
-        ))
+      const updatedActions = state.serviceActions.map(sa => {
+        return {...sa, editing: sa.id === action.id ? true: false}
       });
+      return { ...state, serviceActions: updatedActions}
       break;
-
+    case 'HIDE_ACTION_EDITOR':
+      let sa = state.serviceActions.find((sa) => {
+        return sa.id === action.id;
+      });
+      const update = {
+        ...sa,
+        editing: false
+      }
+      return { ...state, serviceActions: {...state.serviceActions, update}}
     case 'UPDATE_SERVICE_ACTION':
+      if(action.field === 'engineers') {
+        action.value = parseInt(action.value);
+      }
+      let newState = {
+        ...state,
+        serviceActions: state.serviceActions.map(sa => (sa.id === action.id ? 
+            Object.assign({}, sa, { [action.field]: action.value }) : sa   
+          ))
+      }
+      return {
+        ...state,
+
+      }
+      // const calcEngineers = this.calculateEngineers(newState);
+      // newState = {
+      //   ...newState,
+      //   totalEngineers: calcEngineers
+      // }
+      // this.setState(newState);
       break;
-    case ''
+    default:
+      return state;
   }
 }
+
+
+const store = createStore(reducer);
+
 
 class App extends Component {
 
@@ -121,15 +154,6 @@ class App extends Component {
     this.setState(newState);
   }
 
-  showActionEditor(id) {
-    this.setState({
-      serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
-        Object.assign({}, sa, { editing: true }) : 
-        Object.assign({}, sa, { editing: false })
-      ))
-    });
-  }
-
   calculateEngineers(state) { //not using this.state because it may not have been updated yet, instead passing in temporary new state object
     const time = state.scrubber;
     let activeEngineers = 0;
@@ -154,23 +178,23 @@ class App extends Component {
     this.setState(newState);
   }
 
-  updateServiceAction(id, field, value) {
-    if(field === 'engineers') {
-      value = parseInt(value);
-    }
-    let newState = {
-      ...this.state,
-      serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
-          Object.assign({}, sa, { [field]: value }) : sa   
-        ))
-    }
-    const calcEngineers = this.calculateEngineers(newState);
-    newState = {
-      ...newState,
-      totalEngineers: calcEngineers
-    }
-    this.setState(newState);
-  }
+  // updateServiceAction(id, field, value) {
+  //   if(field === 'engineers') {
+  //     value = parseInt(value);
+  //   }
+  //   let newState = {
+  //     ...this.state,
+  //     serviceActions: this.state.serviceActions.map(sa => (sa.id === id ? 
+  //         Object.assign({}, sa, { [field]: value }) : sa   
+  //       ))
+  //   }
+  //   const calcEngineers = this.calculateEngineers(newState);
+  //   newState = {
+  //     ...newState,
+  //     totalEngineers: calcEngineers
+  //   }
+  //   this.setState(newState);
+  // }
 
   updateServiceActionTime(timelineItem) {
     const newStart = moment(timelineItem.start)
@@ -195,49 +219,16 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <PlannerContext.Provider value={
-          {
-            state: this.state,
-            actions: {
-              handleServiceActionClick: event => {
-                let id = event.item;
-                this.showActionEditor(id);
-              },
-              handleServiceActionClose: id => {
-                this.hideActionEditor(id);
-              },
-              handleServiceActionUpdate: (id, field, value) => {
-                this.updateServiceAction(id,field,value);
-              },
-              handleServiceActionTimeChange: item => {
-                this.updateServiceActionTime(item);
-              },
-              handleScrubberUpdate: data => {
-                let newState = {
-                  ...this.state,
-                  scrubber: moment(data.time)
-                }
-                const calcEngineers = this.calculateEngineers(newState);
-                newState = {
-                  ...newState,
-                  totalEngineers: calcEngineers
-                }
-                this.setState(newState);              
-              },
-              toggleTimelineZoom: () => {
-                this.setState({enableTimelineZoom:(this.state.enableTimelineZoom) ? false : true });
-              },
-              toggleAutoScrub: event => {
-                const checked = event.target.checked;
-                this.toggleAutoScrubber(checked);
-              }
 
-            }            
-          }
-        }>
+        <Provider store={store}>
           <PlannerTimeline />
+        </Provider>
+        {/*<Provider store={store}>
+          <TotalEngineers />
+        </Provider>*/}
+        <Provider store={store}>
           <ServiceEditors />
-        </PlannerContext.Provider>
+        </Provider>
       </div>
     );
   }
