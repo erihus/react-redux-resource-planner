@@ -3,28 +3,27 @@ import moment from 'moment';
 import Timeline from 'react-visjs-timeline';
 // import ErrorBoundary from 'ErrorBoundary';
 import { connect } from 'react-redux';
-
+import {showActionEditor} from './actions';
 
 class PlannerTimeline extends React.Component {
 
   constructor(props) {
     super(props);
     this.handleServiceActionClick = this.handleServiceActionClick.bind(this);
+    this.handleServiceActionClick = this.handleServiceActionClick.bind(this);
+  }
 
-    this.items = this.props.serviceActions.map((sa, context) => {
-      const start = sa.start;
-      const end = moment(start).add(sa.duration, 'hours');
-      return  {
-        id: sa.id,
-        start: start,
-        end: end,
-        content: sa.name,
-        group: sa.machineId,
-        title: 'Engineers: '+sa.engineers+', Duration:'+sa.duration+' hours (double click to edit)',
-      }
-    });
+  handleServiceActionClick(event) {
+    let id = event.item;
+    this.props.handleServiceActionClick(id);
+  }
 
-    this.groups = [
+  handleScrubberUpdate() {
+
+  }
+
+	render() {
+      const groups = [
       {
         id: 1,
         content: 'Machine 1',
@@ -39,11 +38,11 @@ class PlannerTimeline extends React.Component {
       }
     ];
 
-    this.customTimes = {
+    const customTimes = {
       scrubber: this.props.scrubber
     }
 
-    this.options = {
+    const options = {
       width: '90%',
       stack: true,
       showMajorLabels: true,
@@ -65,26 +64,27 @@ class PlannerTimeline extends React.Component {
         // props.actions.handleServiceActionTimeChange(item);
       }
     }
-
-  }
-
-
-  handleServiceActionClick(event) {
-    let id = event.item;
-    this.props.dispatch({type:'SHOW_ACTION_EDITOR', 'id': id});
-  }
-
-	render() {
-
+    const items = this.props.serviceActions.map((sa, context) => {
+      const start = sa.start;
+      const end = moment(start).add(sa.duration, 'hours');
+      return  {
+        id: sa.id,
+        start: start,
+        end: end,
+        content: sa.name,
+        group: sa.machineId,
+        title: 'Engineers: '+sa.engineers+', Duration:'+sa.duration+' hours (double click to edit)',
+      }
+    });
 		return(
 			<div id="timeline">
 				<Timeline
-          items={this.items}  
-          groups={this.groups}
-          options={this.options} 
-          customTimes={this.customTimes} 
+          items={items}  
+          groups={groups}
+          options={options} 
+          customTimes={customTimes} 
           doubleClickHandler={this.handleServiceActionClick} 
-          timechangeHandler={this.props.handleScrubberUpdate}
+          timechangeHandler={this.handleScrubberUpdate}
         />
         {/*<div id="toggles">
           <label>Enable Timeline Zooming <input type="checkbox" name="zoom-toggle" onChange={this.props.toggleTimelineZoom}/></label>
@@ -95,11 +95,21 @@ class PlannerTimeline extends React.Component {
 	} 
 }
 
-function mapStateToProps(state) {
+const mapStateToProps = state => {
   return {
-    ...state
+    ...state.serviceActionReducer
   };
 }
 
+const mapDispatchToProps = dispatch => {
+  return {
+    handleServiceActionClick: id => {
+      dispatch(showActionEditor(id))
+    }    
+  }
+}
+
+
+
 // export { PlannerTimeline };
-export default connect(mapStateToProps)(PlannerTimeline);
+export default connect(mapStateToProps, mapDispatchToProps)(PlannerTimeline);

@@ -19,7 +19,7 @@ class ServiceEditors extends Component {
 
 function mapStateToProps(state) {
   return {
-    serviceActions: state.serviceActions
+    serviceActions: state.serviceActionReducer.serviceActions
     // ...state
   };
 }

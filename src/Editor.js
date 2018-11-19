@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 import { connect } from 'react-redux';
+import {updateServiceAction, hideActionEditor} from './actions';
 
 class Editor extends Component {
   constructor(props) {
@@ -10,7 +11,7 @@ class Editor extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);
     this.handleClose = this.handleClose.bind(this);
-    console.log(this.props);
+    // console.log(this.props);
   }
 
   handleChange(event) {
@@ -23,8 +24,9 @@ class Editor extends Component {
   }
 
   handleTimeChange(date){
-    this.props.dispatch({type: 'UPDATE_SERVICE_ACITON_TIME', start: date});
-    // this.props.actions.handleServiceActionUpdate(this.props.id, 'start', date);
+    return;
+  //   this.props.dispatch({type: 'UPDATE_SERVICE_ACITON_TIME', start: date});
+  //   // this.props.actions.handleServiceActionUpdate(this.props.id, 'start', date);
   }
 
   handleClose() {
@@ -53,7 +55,7 @@ class Editor extends Component {
             maxDate={moment().add(7, 'd')} 
           />
           <label>Duration (hrs)</label>
-          <input type="number" name="duration" value={parseInt(this.props.attributes.duration)}  onChange={this.handleChange} />
+          <input type="number" name="duration" defaultValue={parseInt(this.props.attributes.duration)}  onChange={this.handleChange} />
         </form>
       </div>
     );
@@ -69,10 +71,10 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = dispatch => {
   return {
       handleClose: (id) => {
-        dispatch({type: 'HIDE_ACTION_EDITOR', id: id })
+        dispatch( hideActionEditor(id));
       },
-      handleChange: (name, val) => {
-        dispatch({type: 'UPDATE_SERVICE_ACITON', field: name, value: val})
+      handleChange: (id, name, val) => {
+        dispatch(updateServiceAction(id, name, val));
       }
   }
 }

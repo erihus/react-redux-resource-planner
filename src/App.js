@@ -5,121 +5,63 @@ import { createStore, applyMiddleware } from 'redux';
 import PlannerTimeline from './PlannerTimeline';
 import TotalEngineers from './TotalEngineers';
 import ServiceEditors from './ServiceEditors';
+import timelineApp from './reducers';
 import './App.css';
 
 
-const defaultData = {
-  totalEngineers: 0,
-  scrubber: moment().startOf('day'), 
-  autoAdvanceScrubber: false,
-  enableTimelineZoom: false,
-  scrubberInterval: null,
-  weekStart: moment().startOf('day'),
-  weekEnd: moment().startOf('day').add(7, 'days'),
-  serviceActions: [
-    {
-      id: 1,
-      name: 'A',
-      machineId: 1,
-      start: moment().startOf('day'),
-      duration: 12,
-      engineers: 2,
-      editing: false
-    },
-    {
-      id: 2,
-      name: 'B',
-      machineId: 2,
-      start: moment().startOf('day').add(1,'d'),
-      duration: 24,
-      engineers: 3,
-      editing: false
-    },
-    {
-      id: 3,
-      name: 'C',
-      machineId: 1,
-      start: moment().startOf('day').add(3,'d'),
-      duration: 48,
-      engineers: 5,
-      editing: false
-    },
-    {
-      id: 4,
-      name: 'D',
-      machineId: 2,
-      start: moment().startOf('day').add(4,'d'),
-      duration: 12,
-      engineers: 4,
-      editing: false
-    }
-  ] 
-}
 
 
-const reducer = (state = defaultData, action) => {
-  // console.log(action);
-  switch (action.type) {
-    case 'SHOW_ACTION_EDITOR':
-      const updatedActions = state.serviceActions.map(sa => {
-        return {...sa, editing: sa.id === action.id ? true: false}
-      });
-      return { ...state, serviceActions: updatedActions}
-      break;
-    case 'HIDE_ACTION_EDITOR':
-      let sa = state.serviceActions.find((sa) => {
-        return sa.id === action.id;
-      });
-      const update = {
-        ...sa,
-        editing: false
-      }
-      return { ...state, serviceActions: {...state.serviceActions, update}}
-    case 'UPDATE_SERVICE_ACTION':
-      if(action.field === 'engineers') {
-        action.value = parseInt(action.value);
-      }
-      let newState = {
-        ...state,
-        serviceActions: state.serviceActions.map(sa => (sa.id === action.id ? 
-            Object.assign({}, sa, { [action.field]: action.value }) : sa   
-          ))
-      }
-      return {
-        ...state,
-
-      }
-      // const calcEngineers = this.calculateEngineers(newState);
-      // newState = {
-      //   ...newState,
-      //   totalEngineers: calcEngineers
-      // }
-      // this.setState(newState);
-      break;
-    default:
-      return state;
-  }
-}
+// const reducer = (state = defaultData, action) => {
+//   console.log(action);
+//   switch (action.type) {
+//     case 'SHOW_ACTION_EDITOR':
+//       return {
+//         ...state, 
+//         serviceActions: state.serviceActions.map(sa => {
+//           return {...sa, editing: sa.id === action.id ? true: false}
+//         })
+//       };
+//       break;
+//     case 'HIDE_ACTION_EDITOR':
+//       return {
+//         ...state, 
+//         serviceActions: state.serviceActions.map(sa => {
+//           return {...sa, editing: sa.id === action.id ? false: false}
+//         })
+//       };
+//       break;
+//     case 'UPDATE_SERVICE_ACTION':
+//       if(action.field === 'engineers') {
+//         action.value = parseInt(action.value);
+//       }
+//       return {
+//         ...state,
+//         serviceActions: state.serviceActions.map(sa => (sa.id === action.id ? 
+//           Object.assign({}, sa, { [action.field]: action.value }) : sa   
+//         ))
+//       };
+//       // const calcEngineers = this.calculateEngineers(newState);
+//       // newState = {
+//       //   ...newState,
+//       //   totalEngineers: calcEngineers
+//       // }
+//       // this.setState(newState);
+//       break;
+//     default:
+//       return state;
+//   }
+// }
 
 
-const store = createStore(reducer);
+const store = createStore(
+  timelineApp,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+
+);
+const unsubscribe = store.subscribe(() => console.log(store.getState()))
 
 
 class App extends Component {
-
-  constructor(props) {
-    super(props);
-   
-    const calcEngineers = this.calculateEngineers(defaultData);
-    this.state = {
-      ...defaultData,
-      totalEngineers: calcEngineers
-    };
-  }  
-
-  componentWillUnmount() {
-    clearInterval(this.state.interval);
-  }
 
   toggleAutoScrubber(checked) {
     if(checked) {
@@ -169,14 +111,14 @@ class App extends Component {
     return activeEngineers;
   }
 
-  hideActionEditor(id) {
-    const newState = {
-      serviceActions: this.state.serviceActions.map(sa => (
-        Object.assign({}, sa, { editing: false }) : sa        
-      ))
-    };
-    this.setState(newState);
-  }
+  // hideActionEditor(id) {
+  //   const newState = {
+  //     serviceActions: this.state.serviceActions.map(sa => (
+  //       Object.assign({}, sa, { editing: false }) : sa        
+  //     ))
+  //   };
+  //   this.setState(newState);
+  // }
 
   // updateServiceAction(id, field, value) {
   //   if(field === 'engineers') {
