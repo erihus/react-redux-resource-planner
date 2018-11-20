@@ -3,7 +3,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 import { connect } from 'react-redux';
-import {updateServiceAction, hideActionEditor} from './actions';
+import {updateServiceAction, hideActionEditor, calculateEngineers} from './actions';
 
 class Editor extends Component {
   constructor(props) {
@@ -11,21 +11,22 @@ class Editor extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);
     this.handleClose = this.handleClose.bind(this);
-    // console.log(this.props);
   }
 
   handleChange(event) {
     const target = event.target;
-    const val = target.value;
     const name = target.name; 
+    let val = target.value;
+
+    if(name === 'engineers'){
+      val = parseInt(val);
+    }
     
-    this.props.handleChange(this.props.id, name, val);      
+    this.props.handleChange(this.props.id, {[name]: val});      
   }
 
   handleTimeChange(date){
-    return;
-  //   this.props.dispatch({type: 'UPDATE_SERVICE_ACITON_TIME', start: date});
-  //   // this.props.actions.handleServiceActionUpdate(this.props.id, 'start', date);
+    this.props.handleChange(this.props.id, {start: date});
   }
 
   handleClose() {
@@ -68,12 +69,13 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-      handleClose: (id) => {
-        dispatch( hideActionEditor(id));
-      },
-      handleChange: (id, name, val) => {
-        dispatch(updateServiceAction(id, name, val));
-      }
+    handleClose: (id) => {
+      dispatch( hideActionEditor(id));
+    },
+    handleChange: (id, update) => {
+      dispatch(updateServiceAction(id, update));
+      dispatch(calculateEngineers());
+    }
   }
 }
 

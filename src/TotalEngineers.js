@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 import { connect } from 'react-redux'; 
 import {calculateEngineers} from './actions';
 
@@ -26,8 +25,8 @@ class TotalEngineers extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    totalEngineers: state.totalEngineersReducer.totalEngineers,
-    time: state.totalEngineersReducer.scrubber,
+    totalEngineers: state.totalEngineers,
+    time: state.scrubber,
   };
 }
 

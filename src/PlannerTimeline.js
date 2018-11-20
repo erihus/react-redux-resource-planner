@@ -3,7 +3,7 @@ import moment from 'moment';
 import Timeline from 'react-visjs-timeline';
 // import ErrorBoundary from 'ErrorBoundary';
 import { connect } from 'react-redux';
-import {showActionEditor, updateCurrentTime, calculateEngineers} from './actions';
+import {showActionEditor, updateCurrentTime, calculateEngineers, updateServiceAction} from './actions';
 
 class PlannerTimeline extends React.Component {
 
@@ -11,6 +11,7 @@ class PlannerTimeline extends React.Component {
     super(props);
     this.handleServiceActionClick = this.handleServiceActionClick.bind(this);
     this.handleScrubberUpdate = this.handleScrubberUpdate.bind(this);
+    this.handleServiceActionTimeChange = this.handleServiceActionTimeChange.bind(this);
   }
 
   handleServiceActionClick(event) {
@@ -22,7 +23,16 @@ class PlannerTimeline extends React.Component {
     this.props.handleScrubberUpdate(data);
   }
 
+  handleServiceActionTimeChange(timelineItem) {
+    const id = timelineItem.id;
+    const newStart = moment(timelineItem.start);
+    const newEnd = moment(timelineItem.end);
+    const newDuration = newEnd.diff(newStart, 'hours');
+    this.props.handleServiceActionUpdate(id, {start: newStart, duration: newDuration});
+  }
+
 	render() {
+      const component = this;
       const groups = [
       {
         id: 1,
@@ -61,7 +71,7 @@ class PlannerTimeline extends React.Component {
       },
       snap: null,
       onMove: function(item) {
-        // props.actions.handleServiceActionTimeChange(item);
+        component.handleServiceActionTimeChange(item);
       }
     }
     const items = this.props.serviceActions.map((sa, context) => {
@@ -97,7 +107,7 @@ class PlannerTimeline extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    ...state.serviceActionReducer
+    ...state
   };
 }
 
@@ -108,12 +118,14 @@ const mapDispatchToProps = dispatch => {
     },
     handleScrubberUpdate: data => {
       dispatch(updateCurrentTime(data.time));
-      dispatch(calculateEngineers);
+      dispatch(calculateEngineers());
+    },
+    handleServiceActionUpdate: (id, update) => {
+      dispatch(updateServiceAction(id, update));
+      dispatch(calculateEngineers());
     }    
   }
 }
 
 
-
-// export { PlannerTimeline };
 export default connect(mapStateToProps, mapDispatchToProps)(PlannerTimeline);

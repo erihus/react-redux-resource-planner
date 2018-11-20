@@ -18,8 +18,8 @@ export function hideActionEditor(id) {
   return {type: HIDE_ACTION_EDITOR, id: id}
 }
 
-export function updateServiceAction(id, field, value) {
-  return {type: UPDATE_SERVICE_ACTION, id: id, field: field, value: value }
+export function updateServiceAction(id, update) {
+  return {type: UPDATE_SERVICE_ACTION, id: id, update: update }
 }
 
 export function updateCurrentTime(pos) {

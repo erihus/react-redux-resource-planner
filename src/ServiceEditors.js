@@ -15,10 +15,8 @@ class ServiceEditors extends Component {
 
 function mapStateToProps(state) {
   return {
-    serviceActions: state.serviceActionReducer.serviceActions
+    serviceActions: state.serviceActions
   };
 }
 
-
-// export default ServiceEditors;
 export default connect(mapStateToProps)(ServiceEditors);

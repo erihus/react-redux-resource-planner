@@ -5,20 +5,18 @@ import { createStore } from 'redux';
 import PlannerTimeline from './PlannerTimeline';
 import TotalEngineers from './TotalEngineers';
 import ServiceEditors from './ServiceEditors';
-import timelineApp from './reducers';
+import reducer from './reducers';
 import './App.css';
 
 
 const store = createStore(
-  timelineApp,
+  reducer,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-
 );
 // const unsubscribe = store.subscribe(() => console.log(store.getState()))
 
 
 class App extends Component {
-
 
   toggleAutoScrubber(checked) {
     if(checked) {
@@ -53,26 +51,6 @@ class App extends Component {
     this.setState(newState);
   }
 
-  
-  updateServiceActionTime(timelineItem) {
-    const newStart = moment(timelineItem.start)
-    const newEnd = moment(timelineItem.end);
-    const newDuration = newEnd.diff(newStart, 'hours');
-
-    let newState = {
-      ...this.state,
-      serviceActions: this.state.serviceActions.map(sa => (sa.id === timelineItem.id ? 
-        Object.assign({}, sa, { start: newStart, duration: newDuration }) : sa   
-      ))
-    }
-
-    const calcEngineers = this.calculateEngineers(newState);
-    newState = {
-      ...newState,
-      totalEngineers: calcEngineers
-    } 
-    this.setState(newState);
-  }
 
   render() {
     return (
