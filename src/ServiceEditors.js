@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-// import DatePicker from 'react-datepicker';
-// import moment from 'moment';
-// import 'react-datepicker/dist/react-datepicker.css';
 import { connect } from 'react-redux';
-// import {PlannerConsumer} from './Planner.context';
 import Editor from './Editor';
 
 class ServiceEditors extends Component {
@@ -20,7 +16,6 @@ class ServiceEditors extends Component {
 function mapStateToProps(state) {
   return {
     serviceActions: state.serviceActionReducer.serviceActions
-    // ...state
   };
 }
 

@@ -19,7 +19,6 @@ class Editor extends Component {
     const val = target.value;
     const name = target.name; 
     
-    // this.props.dispatch({type: 'UPDATE_SERVICE_ACITON', field: name, value: val});
     this.props.handleChange(this.props.id, name, val);      
   }
 
@@ -30,7 +29,6 @@ class Editor extends Component {
   }
 
   handleClose() {
-    // this.props.dispatch({type: 'HIDE_ACTION_EDITOR', id: this.props.id });
     this.props.handleClose(this.props.id);
   }
 
@@ -64,7 +62,7 @@ class Editor extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    
+    ...ownProps
   };
 }  
 

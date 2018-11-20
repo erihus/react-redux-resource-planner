@@ -3,14 +3,14 @@ import moment from 'moment';
 import Timeline from 'react-visjs-timeline';
 // import ErrorBoundary from 'ErrorBoundary';
 import { connect } from 'react-redux';
-import {showActionEditor} from './actions';
+import {showActionEditor, updateCurrentTime, calculateEngineers} from './actions';
 
 class PlannerTimeline extends React.Component {
 
   constructor(props) {
     super(props);
     this.handleServiceActionClick = this.handleServiceActionClick.bind(this);
-    this.handleServiceActionClick = this.handleServiceActionClick.bind(this);
+    this.handleScrubberUpdate = this.handleScrubberUpdate.bind(this);
   }
 
   handleServiceActionClick(event) {
@@ -18,8 +18,8 @@ class PlannerTimeline extends React.Component {
     this.props.handleServiceActionClick(id);
   }
 
-  handleScrubberUpdate() {
-
+  handleScrubberUpdate(data) { 
+    this.props.handleScrubberUpdate(data);
   }
 
 	render() {
@@ -105,6 +105,10 @@ const mapDispatchToProps = dispatch => {
   return {
     handleServiceActionClick: id => {
       dispatch(showActionEditor(id))
+    },
+    handleScrubberUpdate: data => {
+      dispatch(updateCurrentTime(data.time));
+      dispatch(calculateEngineers);
     }    
   }
 }
