@@ -12,6 +12,30 @@ class PlannerTimeline extends React.Component {
     this.handleServiceActionClick = this.handleServiceActionClick.bind(this);
     this.handleScrubberUpdate = this.handleScrubberUpdate.bind(this);
     this.handleServiceActionTimeChange = this.handleServiceActionTimeChange.bind(this);
+    this.handleRangeChange = this.handleRangeChange.bind(this);
+    const component = this;
+    this.options = {
+      width: '90%',
+      stack: true,
+      showMajorLabels: true,
+      showMinorLabels: true,
+      showCurrentTime: false,
+      showTooltips: true,
+      start: this.props.weekStart,
+      end: this.props.weekEnd,
+      zoomMin: 1000000,
+      type: 'range',
+      zoomable: true,//(this.props.enableTimelineZoom) ? true : false,
+      // moveable: (this.props.enableTimelineZoom) ? true : false,
+      editable: {
+        updateTime: true,
+        overrideItems: true
+      },
+      snap: null,
+      onMove: function(item) {
+        component.handleServiceActionTimeChange(item);
+      }
+    }
   }
 
   handleServiceActionClick(event) {
@@ -31,8 +55,13 @@ class PlannerTimeline extends React.Component {
     this.props.handleServiceActionUpdate(id, {start: newStart, duration: newDuration});
   }
 
+  handleRangeChange(data) {
+    console.log(data);
+    this.options.start = data.start;
+    this.options.end = data.end;
+  }
+
 	render() {
-      const component = this;
       const groups = [
       {
         id: 1,
@@ -52,28 +81,28 @@ class PlannerTimeline extends React.Component {
       scrubber: this.props.scrubber
     }
 
-    const options = {
-      width: '90%',
-      stack: true,
-      showMajorLabels: true,
-      showMinorLabels: true,
-      showCurrentTime: false,
-      showTooltips: true,
-      start: this.props.weekStart,
-      end: this.props.weekEnd,
-      zoomMin: 1000000,
-      type: 'range',
-      zoomable: (this.props.enableTimelineZoom) ? true : false,
-      moveable: (this.props.enableTimelineZoom) ? true : false,
-      editable: {
-        updateTime: true,
-        overrideItems: true
-      },
-      snap: null,
-      onMove: function(item) {
-        component.handleServiceActionTimeChange(item);
-      }
-    }
+    // const options = {
+    //   width: '90%',
+    //   stack: true,
+    //   showMajorLabels: true,
+    //   showMinorLabels: true,
+    //   showCurrentTime: false,
+    //   showTooltips: true,
+    //   start: this.props.weekStart,
+    //   end: this.props.weekEnd,
+    //   zoomMin: 1000000,
+    //   type: 'range',
+    //   zoomable: true,//(this.props.enableTimelineZoom) ? true : false,
+    //   // moveable: (this.props.enableTimelineZoom) ? true : false,
+    //   editable: {
+    //     updateTime: true,
+    //     overrideItems: true
+    //   },
+    //   snap: null,
+    //   onMove: function(item) {
+    //     component.handleServiceActionTimeChange(item);
+    //   }
+    // }
     const items = this.props.serviceActions.map((sa, context) => {
       const start = sa.start;
       const end = moment(start).add(sa.duration, 'hours');
@@ -91,10 +120,11 @@ class PlannerTimeline extends React.Component {
 				<Timeline
           items={items}  
           groups={groups}
-          options={options} 
+          options={this.options} 
           customTimes={customTimes} 
           doubleClickHandler={this.handleServiceActionClick} 
           timechangeHandler={this.handleScrubberUpdate}
+          rangechangeHandler={this.handleRangeChange}
         />
         {/*<div id="toggles">
           <label>Enable Timeline Zooming <input type="checkbox" name="zoom-toggle" onChange={this.props.toggleTimelineZoom}/></label>
